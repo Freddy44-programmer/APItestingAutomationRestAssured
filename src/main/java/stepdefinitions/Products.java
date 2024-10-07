@@ -27,6 +27,8 @@ public class Products {
 
     public String s;
 
+
+    // get/retrieve products
     @Given("I hit the url of get products api endpoint")
     public void i_hit_the_url_of_get_products_api_endpoint(){
         RestAssured.baseURI = "https://fakestoreapi.com/";
@@ -55,24 +57,18 @@ public class Products {
         JsonPath jsnPath = response.jsonPath();
 
         String s = jsnPath.getJsonObject("rating[0].rate").toString();
-
         assertEquals(rate, s);
     }
 
 
-
-
-
+    // post/add products
     @Given("I hit the url of post product api endpoint")
     public void iHitTheUrlOfPostProductApiEndpoint() {
         RestAssured.baseURI = "https://fakestoreapi.com/";
         httpRequest = given();
         requestParams = new JSONObject();
 
-
-
     }
-
 
     @And("I pass the request body of product title {}")
     public void iPassTheRequestBodyOfProductTitle(String title) {
@@ -94,12 +90,13 @@ public class Products {
         System.out.println(body.asString());
     }
 
+
+
+    // put/update product
     @Then("I receive the response body with id as {}")
     public void iReceiveTheResponseBodyWithIdAsId(String id) {
        assertEquals(id, s);
     }
-
-
 
 
     @Given("I hit the url of put product api endpoint")
@@ -130,4 +127,33 @@ public class Products {
         System.out.println(body.asString());
     }
 
+
+    // delete product
+    @Given("I hit the url of delete product api endpoint")
+    public void iHitTheUrlOfDeleteProductApiEndpoint() {
+        RestAssured.baseURI = "https://fakestoreapi.com/";
+        requestParams = new JSONObject();
+    }
+
+
+    @When("I pass the url of delete products in the request with {}")
+    public void iPassTheUrlOfDeleteProductsInTheRequestWithProductId(String productId) {
+        httpRequest = RestAssured.given();
+
+        requestParams.put("title","test product");
+        requestParams.put("price", "13.5");
+        requestParams.put("description", "shoes");
+        requestParams.put("image", "https://i.pravatar.cc");
+        requestParams.put("category", "electronic");
+
+        httpRequest.body(requestParams.toJSONString());
+        response = httpRequest.delete("products/"+ productId);
+        ResponseBody body = response.getBody();
+
+        JsonPath jsnPath = response.jsonPath();
+        s = jsnPath.getJsonObject("id").toString();
+
+        System.out.println(response.getStatusLine());
+        System.out.println(body.asString());
+    }
 }
